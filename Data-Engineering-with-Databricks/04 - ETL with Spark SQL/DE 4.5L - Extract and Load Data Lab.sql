@@ -73,6 +73,26 @@
 
 -- COMMAND ----------
 
+SELECT * FROM json.`${da.paths.datasets}/raw/events-kafka/`
+
+-- COMMAND ----------
+
+CREATE TABLE events_json
+  (key BINARY, offset BIGINT, partition INT, timestamp BIGINT, topic STRING, value BINARY)
+USING JSON
+LOCATION "${da.paths.datasets}/raw/events-kafka/"
+
+-- COMMAND ----------
+
+SELECT * FROM events_json
+
+-- COMMAND ----------
+
+-- MAGIC %python
+-- MAGIC print(DA.paths.working_dir)
+
+-- COMMAND ----------
+
 -- MAGIC %md
 -- MAGIC 
 -- MAGIC 
@@ -104,6 +124,11 @@
 
 -- COMMAND ----------
 
+CREATE TABLE events_raw
+  (key BINARY, offset BIGINT, partition INT, timestamp BIGINT, topic STRING, value BINARY)
+
+-- COMMAND ----------
+
 -- MAGIC %md
 -- MAGIC 
 -- MAGIC 
@@ -129,7 +154,11 @@
 -- COMMAND ----------
 
 -- TODO
-<FILL_IN>
+--<FILL_IN>
+--CREATE OR REPLACE TABLE events_raw AS
+INSERT INTO events_raw
+SELECT key, offset, partition, timestamp, topic, value
+FROM events_json;
 
 -- COMMAND ----------
 
@@ -141,7 +170,7 @@
 -- COMMAND ----------
 
 -- TODO
-<FILL_IN>
+SELECT * FROM events_raw
 
 -- COMMAND ----------
 
@@ -170,7 +199,13 @@
 -- COMMAND ----------
 
 -- TODO
-<FILL_IN> ${da.paths.datasets}/raw/item-lookup
+--<FILL_IN> 
+CREATE OR REPLACE TABLE item_lookup AS
+SELECT * FROM parquet.`${da.paths.datasets}/raw/item-lookup`
+
+-- COMMAND ----------
+
+SELECT * FROM item_lookup
 
 -- COMMAND ----------
 
